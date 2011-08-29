@@ -39,7 +39,7 @@ public class BshdCommand implements CommandExecutor {
 		}
 		
 		try {
-			Socket s = new Socket("localhost", 1338);
+			Socket s = new Socket("localhost", 24012);
 			s.setSoTimeout(10);
 			BufferedReader in = new BufferedReader
 			  (new InputStreamReader(s.getInputStream()));

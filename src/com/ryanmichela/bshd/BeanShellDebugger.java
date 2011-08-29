@@ -20,6 +20,9 @@ import java.util.logging.Logger;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.net.URLClassLoader;
+import java.net.URL;
+import java.lang.reflect.Method;
 
 import bsh.Interpreter;
 
@@ -40,10 +43,20 @@ public class BeanShellDebugger extends JavaPlugin {
 		if(!getDataFolder().exists()) {
 			getDataFolder().mkdir();
 		}
-		
-		bsh = new Interpreter();
+
 		try {
-			bsh.set("portnum", 1337);
+
+            URL url = new File(getDataFolder().getPath() + "/bsh-2.0b4.jar").toURI().toURL() ;
+
+            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Class urlClass = URLClassLoader.class;
+            Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+            method.setAccessible(true);
+            method.invoke(urlClassLoader, new Object[]{url});
+
+
+            bsh = new Interpreter();
+			bsh.set("portnum", 24011);
 			
 			// Set up debug environment with globals
 			bsh.set("pluginLoader", getPluginLoader());
@@ -73,8 +86,8 @@ public class BeanShellDebugger extends JavaPlugin {
 			
 			bsh.eval("setAccessibility(true)"); // turn off access restrictions
 			bsh.eval("server(portnum)");
-			log.info("[bshd] BeanShell web console at http://localhost:1337");
-			log.info("[bshd] BeanShell telnet console at localhost:1338");
+			log.info("[bshd] BeanShell web console at http://localhost:24011");
+			log.info("[bshd] BeanShell telnet console at localhost:24012");
 			
 			// Register the bshd command
 			getCommand("bshd").setExecutor(new BshdCommand());
